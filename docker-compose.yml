@@ -1,0 +1,46 @@
+version: "3.1"
+
+services:
+  db:
+    image: postgres:11
+    networks:
+      - sonarnet
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=superHeroP@ssword
+    ports:
+      - 5432:5432
+    volumes:
+      - postgresql:/var/lib/postgresql
+      - postgresql_data:/var/lib/postgresql/data
+
+
+  sonarqube:
+    image: sonarqube
+    ports:
+      - "9000:9000"
+    networks:
+      - sonarnet
+    environment:
+      - POSTGRES=Host=host.docker.internal;Database=sonar;Username=postgres;Password=superHeroP@ssword;ApplicationName=sonarqube
+      - sonar.jdbc.username=sonar
+      - sonar.jdbc.password=superHeroP@ssword
+      - sonar.jdbc.url=jdbc:postgresql://host.docker.internal:5432/sonar
+    volumes:
+      - sonarqube_conf:/opt/sonarqube/conf
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      
+  
+networks:
+  sonarnet:
+    driver: bridge
+      
+volumes:
+  sonarqube_conf:
+  sonarqube_data:
+  sonarqube_extensions:
+  postgresql:
+  postgresql_data:
+  pgdata:
+      driver: local
